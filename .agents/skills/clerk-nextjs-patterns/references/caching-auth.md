@@ -34,9 +34,12 @@ export async function updateProfile(formData: FormData) {
   const { userId } = await auth();
   if (!userId) throw new Error('Unauthorized');
 
+  const name = formData.get('name');
+  if (typeof name !== 'string' || !name) throw new Error('Invalid name');
+
   await db.users.update({
     where: { id: userId },
-    data: { name: formData.get('name') as string },
+    data: { name },
   });
   revalidateTag(`user-${userId}`);
 }

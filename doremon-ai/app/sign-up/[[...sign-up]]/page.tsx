@@ -21,7 +21,7 @@ const features = [
 
 export default function SignUpPage() {
   return (
-    <div className="flex h-screen bg-[var(--bg-base)]">
+    <div className="flex min-h-screen bg-[var(--bg-base)]">
       {/* Left panel — brand + features, hidden on small screens */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-[var(--bg-surface)] border-r border-[var(--border-default)]">
         <div className="max-w-md">
@@ -55,7 +55,7 @@ export default function SignUpPage() {
       </div>
 
       {/* Right panel — full width on small screens */}
-      <div className="flex flex-1 items-center justify-center px-4">
+      <div className="flex flex-1 justify-center px-4 py-12">
         <SignUp />
       </div>
     </div>

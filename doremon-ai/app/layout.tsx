@@ -25,30 +25,32 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        theme: dark,
-        variables: {
-          colorBackground: "var(--bg-surface)",
-          colorInput: "var(--bg-elevated)",
-          colorInputForeground: "var(--text-primary)",
-          colorForeground: "var(--text-primary)",
-          colorMutedForeground: "var(--text-secondary)",
-          colorPrimary: "var(--accent-primary)",
-          colorPrimaryForeground: "#ffffff",
-          colorDanger: "var(--state-error)",
-          colorSuccess: "var(--state-success)",
-          borderRadius: "0.75rem",
-          fontFamily: "var(--font-geist-sans)",
-        },
-      }}
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <html
-        lang="en"
-        className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      >
-        <body className="min-h-full flex flex-col">{children}</body>
-      </html>
-    </ClerkProvider>
+      <body className="min-h-full flex flex-col">
+        <ClerkProvider
+          appearance={{
+            theme: dark,
+            variables: {
+              colorBackground: "var(--bg-surface)",
+              colorInput: "var(--bg-elevated)",
+              colorInputForeground: "var(--text-primary)",
+              colorForeground: "var(--text-primary)",
+              colorMutedForeground: "var(--text-secondary)",
+              colorPrimary: "var(--accent-primary)",
+              colorPrimaryForeground: "#ffffff",
+              colorDanger: "var(--state-error)",
+              colorSuccess: "var(--state-success)",
+              borderRadius: "0.75rem",
+              fontFamily: "var(--font-geist-sans)",
+            },
+          }}
+        >
+          {children}
+        </ClerkProvider>
+      </body>
+    </html>
   );
 }

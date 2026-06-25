@@ -47,7 +47,7 @@
       "scaffold": "nextjs-basic-auth",
       "assertions": [
         "Imports createRouteMatcher from @clerk/nextjs/server",
-        "Defines public routes array including / and /sign-in",
+        "Defines public routes array including /, /sign-in, and /sign-up",
         "Uses auth.protect() for non-public routes inside clerkMiddleware callback",
         "Middleware protects /dashboard, /profile, and /api routes",
         "Does NOT remove the clerkMiddleware wrapper"
@@ -74,6 +74,9 @@
         "Extracts the token from the Authorization Bearer header",
         "Verifies the token using either jsonwebtoken with CLERK_PEM_PUBLIC_KEY or @clerk/backend verifyToken",
         "Checks token expiration (exp claim) and not-before (nbf claim)",
+        "Validates the issuer (iss claim) matches the expected Clerk app issuer",
+        "Validates the audience (aud claim) matches the expected value or Clerk app-binding claim",
+        "Returns 401 for tokens with mismatched issuer or audience",
         "Returns 401 for invalid or expired tokens",
         "Returns the decoded claims or user data on successful verification"
       ]
