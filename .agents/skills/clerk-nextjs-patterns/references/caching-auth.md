@@ -45,12 +45,19 @@ export async function updateProfile(formData: FormData) {
 ## Org-Scoped Cache
 
 ```typescript
-const { orgId } = await auth();
-const getOrgData = unstable_cache(
-  () => db.orgData.findMany({ where: { organizationId: orgId } }),
-  [`org-${orgId}-data`],
-  { revalidate: 300, tags: [`org-${orgId}`] }
-);
+export default async function OrgDashboard() {
+  const { orgId } = await auth();
+  if (!orgId) return <div>No organization selected</div>;
+
+  const getOrgData = unstable_cache(
+    () => db.orgData.findMany({ where: { organizationId: orgId } }),
+    [`org-${orgId}-data`],
+    { revalidate: 300, tags: [`org-${orgId}`] }
+  );
+
+  const orgData = await getOrgData();
+  return <div>{orgData.length} items</div>;
+}
 ```
 
 [Docs](https://nextjs.org/docs/app/building-your-application/caching)
