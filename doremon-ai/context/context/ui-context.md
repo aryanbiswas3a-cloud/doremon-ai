@@ -18,8 +18,8 @@ All colors are defined as CSS custom properties in `globals.css` and mapped to T
 | Secondary text   | `--text-secondary`     | `#c0c0cc`                 |
 | Muted text       | `--text-muted`         | `#808090`                 |
 | Faint text       | `--text-faint`         | `#505060`                 |
-| Brand accent     | `--accent-primary`     | `#00c8d4` (cyan)          |
-| Brand dim        | `--accent-primary-dim` | `rgba(0, 200, 212, 0.12)` |
+| Brand accent     | `--accent-primary`     | `#0088ff` (Doraemon blue) |
+| Brand dim        | `--accent-primary-dim` | `rgba(0, 136, 255, 0.12)` |
 | AI accent        | `--accent-ai`          | `#6457f9` (indigo-purple) |
 | AI text          | `--accent-ai-text`     | `#8b82ff`                 |
 | Error            | `--state-error`        | `#ff4d4f`                 |
