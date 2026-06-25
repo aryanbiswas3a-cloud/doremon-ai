@@ -30,7 +30,7 @@
   --color-popover: var(--bg-elevated);
   --color-popover-foreground: var(--text-primary);
   --color-primary: var(--accent-primary);
-  --color-primary-foreground: #080809;
+  --color-primary-foreground: #ffffff;
   --color-secondary: var(--bg-subtle);
   --color-secondary-foreground: var(--text-secondary);
   --color-muted: var(--bg-elevated);
@@ -62,8 +62,8 @@
   --text-secondary: #c0c0cc;
   --text-muted: #808090;
   --text-faint: #505060;
-  --accent-primary: #00c8d4;
-  --accent-primary-dim: rgba(0, 200, 212, 0.12);
+  --accent-primary: #0088ff;
+  --accent-primary-dim: rgba(0, 136, 255, 0.12);
   --accent-ai: #6457f9;
   --accent-ai-text: #8b82ff;
   --state-error: #ff4d4f;
