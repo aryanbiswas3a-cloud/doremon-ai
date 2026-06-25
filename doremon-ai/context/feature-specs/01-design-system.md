@@ -10,19 +10,19 @@ Add this shadcn in components.
 - dialog
 - input
 - tabs
-- taxtarea
-- schoolarea
+- textarea
+- scroll-area
 
-Do not modify generated 'component/UI/*' Files are After installation. 
+Do not modify generated 'components/ui/*' files after installation. 
 
 Also install 'lucide-react'.
 
-create 'lib/utils.ts' With our reusable 'cn()' Helper For merging Teilwind classes.
+create 'lib/utils.ts' with our reusable 'cn()' helper for merging Tailwind classes.
 
-Ensure all components match the existing dark theme in 'global.css'.
+Ensure all components match the existing dark theme in 'globals.css'.
 
 # check when done
 
--All components important without.
--'cn()' works properly.
-= No before flight styling update 
+- All components import without errors.
+- 'cn()' works properly.
+- No broken styling or missing tokens.

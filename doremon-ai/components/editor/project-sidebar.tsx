@@ -15,6 +15,8 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
       className={`fixed bottom-0 left-0 top-12 z-50 flex w-72 flex-col border-r border-[var(--border-default)] bg-[var(--bg-surface)] transition-transform duration-300 ease-in-out ${
         isOpen ? "translate-x-0" : "-translate-x-full"
       }`}
+      aria-hidden={!isOpen}
+      inert={!isOpen ? "" : undefined}
     >
       {/* Header */}
       <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
