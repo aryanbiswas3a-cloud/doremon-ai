@@ -31,6 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ClerkProvider
+          afterSignOutUrl="/sign-in"
           appearance={{
             theme: dark,
             variables: {
@@ -40,7 +41,7 @@ export default function RootLayout({
               colorForeground: "var(--text-primary)",
               colorMutedForeground: "var(--text-secondary)",
               colorPrimary: "var(--accent-primary)",
-              colorPrimaryForeground: "#ffffff",
+              colorPrimaryForeground: "var(--text-primary)",
               colorDanger: "var(--state-error)",
               colorSuccess: "var(--state-success)",
               borderRadius: "0.75rem",

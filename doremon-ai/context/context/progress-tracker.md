@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 03: Auth — Completed
+- Feature 04: Project Dialogs — In Progress
 
 ## Current Goal
 
-- Feature 04: TBD
+- Build the `/editor` home screen and add project dialogs/sidebar actions (no API calls or persistence).
 
 ## Completed
 
@@ -18,7 +18,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## In Progress
 
-- None.
+- **04-project-dialogs**: Editor home screen, Create/Rename/Delete project dialogs, sidebar project items with rename/delete actions, mobile backdrop scrim, `useProjectDialogs` hook for dialog/form/loading state, mock project data only.
 
 
 ## Next Up

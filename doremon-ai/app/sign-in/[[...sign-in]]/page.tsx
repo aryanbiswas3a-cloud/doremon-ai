@@ -21,7 +21,7 @@ const features = [
 
 export default function SignInPage() {
   return (
-    <div className="flex h-screen bg-[var(--bg-base)]">
+    <div className="flex min-h-screen bg-[var(--bg-base)]">
       {/* Left panel — brand + features, hidden on small screens */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-16 bg-[var(--bg-surface)] border-r border-[var(--border-default)]">
         <div className="max-w-md">
