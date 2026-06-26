@@ -6,19 +6,15 @@
 
 ```typescript
 import { auth } from '@clerk/nextjs/server';
-import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
+
+const cachedGetUserData = cache(async (id: string) => getUserData(id));
 
 export default async function ProfilePage() {
   const { userId } = await auth();
   if (!userId) return <div>Not signed in</div>;
 
-  const cachedGetUserData = unstable_cache(
-    () => getUserData(userId),
-    [`user-${userId}`],
-    { revalidate: 60, tags: [`user-${userId}`] }
-  );
-
-  const userData = await cachedGetUserData();
+  const userData = await cachedGetUserData(userId);
   return <div>{userData.name}</div>;
 }
 ```
@@ -52,13 +48,11 @@ export default async function OrgDashboard() {
   const { orgId } = await auth();
   if (!orgId) return <div>No organization selected</div>;
 
-  const getOrgData = unstable_cache(
-    () => db.orgData.findMany({ where: { organizationId: orgId } }),
-    [`org-${orgId}-data`],
-    { revalidate: 300, tags: [`org-${orgId}`] }
+  const getOrgData = cache(async (id: string) =>
+    db.orgData.findMany({ where: { organizationId: id } })
   );
 
-  const orgData = await getOrgData();
+  const orgData = await getOrgData(orgId);
   return <div>{orgData.length} items</div>;
 }
 ```

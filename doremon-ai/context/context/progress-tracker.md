@@ -4,11 +4,11 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 03: Auth — Completed
+- Feature 04: Project Dialogs — In Progress
 
 ## Current Goal
 
-- Feature 04: TBD
+- Build the `/editor` home screen and add project dialogs/sidebar actions (no API calls or persistence).
 
 ## Completed
 
@@ -18,7 +18,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## In Progress
 
-- None.
+- **04-project-dialogs**: Editor home screen, Create/Rename/Delete project dialogs, sidebar project items with rename/delete actions, mobile backdrop scrim, `useProjectDialogs` hook for dialog/form/loading state, mock project data only.
 
 
 ## Next Up
@@ -35,7 +35,7 @@ Update this file whenever the current phase, active feature, or implementation s
 - "schoolarea" in 01-design-system.md was interpreted as shadcn's scroll-area component.
 - tw-animate-css was not installed; animations can be added when needed by a specific feature.
 - Dialog pattern (Feature 02): The existing shadcn Dialog, DialogHeader, DialogTitle, DialogDescription, and DialogFooter components already satisfy the pattern. All tokens are mapped in globals.css. No new dialog component was created.
-- CSS token usage: Project design tokens (--bg-surface, --border-default, etc.) are referenced via `var()` arbitrary values in Tailwind classes rather than generated utility names, to avoid any Tailwind v4 utility resolution ambiguity.
+- CSS token usage: Current chrome components reference design tokens via `var()` arbitrary values (e.g. `bg-[var(--bg-surface)]`). This deviates from `code-standards.md` and `ui-context.md`, which require utility names like `bg-base`, `text-brand`, `border-surface-border`. The arbitrary-value approach was a short-term workaround; components should be migrated to the standard utility names when next touched. See [[code-standards]] and [[ui-context]].
 - Auth (Feature 03): In Next.js 16, middleware is renamed to Proxy — `proxy.ts` is the correct file name. Clerk's `ClerkProvider` appearance takes `theme` (not `baseTheme`) to apply a prebuilt theme. Clerk `Variables` uses `colorInput`/`colorInputForeground`/`colorForeground`/`colorMutedForeground` (not the older `colorInputBackground`/`colorText`/`colorTextSecondary`). `.env.local` must be at the project root, not inside `public/`.
 
 ## Session Notes

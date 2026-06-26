@@ -41,8 +41,8 @@ Use the existing color token from 'global.css' from dialog styling.
 
  Do not build actual dialog yet. 
 
- ### Check when done
+### Check when done
 
- - New components compile with TypeScript errors.
+ - New components compile without TypeScript errors.
  - No lint errors.
  - Dialog pattern is ready for future use. 
