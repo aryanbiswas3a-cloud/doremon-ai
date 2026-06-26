@@ -4,26 +4,27 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 04: Project Dialogs — In Progress
+- Feature 05: Prisma — Completed
 
 ## Current Goal
 
-- Build the `/editor` home screen and add project dialogs/sidebar actions (no API calls or persistence).
+- Add API routes and real persistence using the Prisma client.
 
 ## Completed
 
+- **05-prisma**: `prisma/models/project.prisma` created with `Project` and `ProjectCollaborator` models. `prisma.config.ts` updated to load `doremon-ai/.env.local` and expose the datasource URL. Migration `20260626120041_init` applied to Prisma Postgres. Client generated to `doremon-ai/app/generated/prisma`. `doremon-ai/lib/prisma.ts` exports a cached singleton that branches on `DATABASE_URL` — `prisma+postgres://` uses `accelerateUrl`, all other URLs use `@prisma/adapter-pg`. `npm run build` passes.
+- **04-project-dialogs**: Editor home screen, Create/Rename/Delete project dialogs, sidebar project items with rename/delete actions, mobile backdrop scrim, `useProjectDialogs` hook for dialog/form/loading state, mock project data only.
 - **01-design-system**: shadcn/ui installed and configured (Tailwind v4), UI primitives added (button, card, dialog, input, tabs, textarea, scroll-area), lucide-react installed, lib/utils.ts with cn() helper created, dark theme CSS variables defined in globals.css.
 - **02-editor-chrome**: EditorNavbar and ProjectSidebar shell components created. Navbar is fixed-height with PanelLeftOpen/PanelLeftClose toggle. Sidebar floats above canvas (fixed position, does not push content), slides in from left via CSS transform, includes shadcn Tabs (My Projects / Shared) with empty placeholder states and a full-width New Project button.
 - **03-auth**: Clerk auth fully wired. `@clerk/nextjs` and `@clerk/ui` installed. `ClerkProvider` wraps root layout with `dark` theme and CSS variable overrides. `proxy.ts` at project root uses protected-first strategy — all routes locked except `/sign-in` and `/sign-up` (read from env vars). Sign-in and sign-up pages use a two-column layout (logo + tagline left, Clerk form right; form-only on mobile). `app/page.tsx` redirects authenticated users to `/editor` and unauthenticated users to `/sign-in`. `UserButton` added to editor navbar right section.
 
 ## In Progress
 
-- **04-project-dialogs**: Editor home screen, Create/Rename/Delete project dialogs, sidebar project items with rename/delete actions, mobile backdrop scrim, `useProjectDialogs` hook for dialog/form/loading state, mock project data only.
-
+- None.
 
 ## Next Up
 
-- Add the next planned feature unit here.
+- Add API routes and wire dialogs to real Prisma persistence.
 
 ## Open Questions
 
@@ -31,6 +32,8 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Architecture Decisions
 
+- Prisma v7 schema split: `prisma/schema.prisma` holds generator + datasource (provider only); models live in `prisma/models/project.prisma`. Connection URL moved to `prisma.config.ts` per Prisma v7 requirement. Prisma.config.ts loads `doremon-ai/.env.local` and normalizes `Database_URL` → `DATABASE_URL` for cross-platform safety.
+- `PrismaClient` in v7 requires exactly one of `{ adapter }` or `{ accelerateUrl }` — no zero-arg constructor. The singleton uses `accelerateUrl` for `prisma+postgres://` and `@prisma/adapter-pg` for all other URLs.
 - shadcn/ui initialized manually (components.json created by hand) because the CLI's interactive init prompt does not work in non-TTY environments. `npx shadcn@latest add` was used to scaffold all component files.
 - "schoolarea" in 01-design-system.md was interpreted as shadcn's scroll-area component.
 - tw-animate-css was not installed; animations can be added when needed by a specific feature.
