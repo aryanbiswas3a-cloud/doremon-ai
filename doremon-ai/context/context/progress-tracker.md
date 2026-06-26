@@ -4,14 +4,16 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Phase
 
-- Feature 05: Prisma — Completed
+- Feature 07: Wire Editor Home — Completed
 
 ## Current Goal
 
-- Add API routes and real persistence using the Prisma client.
+- None.
 
 ## Completed
 
+- **07-wire-editor-home**: `lib/projects.ts` (server-only helper with `getProjectsForUser` using Clerk `auth` + `currentUser` for owned/shared queries; `ProjectSummary` interface). `lib/slug.ts` extracted with `toSlug` (client-safe). `hooks/use-project-dialogs.ts` replaced mock mutations with real fetch calls (`POST /api/projects` → navigate, `PATCH /api/project/[id]` → refresh, `DELETE /api/project/[id]` → redirect or refresh); accepts `ownedProjects`/`sharedProjects` props; generates a stable random suffix per dialog open for the room-id preview. `app/editor/layout.tsx` is now an async server component that calls `getProjectsForUser` and passes results to `EditorShell`. `EditorShell` accepts `ownedProjects`/`sharedProjects` and forwards them to the hook. `components/editor/new-project-button.tsx` is a small client component so `app/editor/page.tsx` can be a server component. Create dialog now shows `room:` preview. `npm run build` passes.
+- **06-projects-api**: `app/api/projects/route.ts` (GET list, POST create) and `app/api/project/[projectId]/route.ts` (PATCH rename, DELETE delete). All routes authenticate via Clerk `userId`; unauthenticated requests return 401; ownership enforced on mutations with 403 for non-owners; missing project name defaults to "Untitled project"; IDs are Prisma-generated (no sequential override); DELETE returns 204 No Content.
 - **05-prisma**: `prisma/models/project.prisma` created with `Project` and `ProjectCollaborator` models. `prisma.config.ts` updated to load `doremon-ai/.env.local` and expose the datasource URL. Migration `20260626120041_init` applied to Prisma Postgres. Client generated to `doremon-ai/app/generated/prisma`. `doremon-ai/lib/prisma.ts` exports a cached singleton that branches on `DATABASE_URL` — `prisma+postgres://` uses `accelerateUrl`, all other URLs use `@prisma/adapter-pg`. `npm run build` passes.
 - **04-project-dialogs**: Editor home screen, Create/Rename/Delete project dialogs, sidebar project items with rename/delete actions, mobile backdrop scrim, `useProjectDialogs` hook for dialog/form/loading state, mock project data only.
 - **01-design-system**: shadcn/ui installed and configured (Tailwind v4), UI primitives added (button, card, dialog, input, tabs, textarea, scroll-area), lucide-react installed, lib/utils.ts with cn() helper created, dark theme CSS variables defined in globals.css.
@@ -24,7 +26,7 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Next Up
 
-- Add API routes and wire dialogs to real Prisma persistence.
+- Nothing defined yet.
 
 ## Open Questions
 

@@ -10,14 +10,18 @@ import {
 } from "@/components/editor/project-dialogs";
 import { useProjectDialogs } from "@/hooks/use-project-dialogs";
 import { ProjectDialogContext } from "@/contexts/project-dialog-context";
+import type { ProjectSummary } from "@/lib/projects";
+
 
 interface EditorShellProps {
   children: React.ReactNode;
+  ownedProjects: ProjectSummary[];
+  sharedProjects: ProjectSummary[];
 }
 
-export function EditorShell({ children }: EditorShellProps) {
+export function EditorShell({ children, ownedProjects, sharedProjects }: EditorShellProps) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const dialogs = useProjectDialogs();
+  const dialogs = useProjectDialogs({ ownedProjects, sharedProjects });
 
   return (
     <ProjectDialogContext.Provider value={{ openCreate: dialogs.openCreate }}>
@@ -27,7 +31,6 @@ export function EditorShell({ children }: EditorShellProps) {
           onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         />
 
-        {/* Mobile backdrop scrim — closes sidebar on tap outside */}
         {isSidebarOpen && (
           <div
             className="fixed inset-0 z-40 bg-black/50 md:hidden"
