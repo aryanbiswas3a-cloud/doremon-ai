@@ -1,0 +1,7 @@
+reviews:
+  path_filters:
+    - "!.agents/**"
+    - "!.claude/**"
+    - "!doremon-ai/app/generated/**"
+    - "!**/package-lock.json"
+    - "!skills-lock.json"
