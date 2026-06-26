@@ -4,15 +4,15 @@ import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Project } from "@/lib/mock-data";
+import type { ProjectSummary } from "@/lib/projects";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  projects: Project[];
+  projects: ProjectSummary[];
   onNewProject: () => void;
-  onRename: (project: Project) => void;
-  onDelete: (project: Project) => void;
+  onRename: (project: ProjectSummary) => void;
+  onDelete: (project: ProjectSummary) => void;
 }
 
 export function ProjectSidebar({
@@ -120,9 +120,9 @@ export function ProjectSidebar({
 }
 
 interface ProjectItemProps {
-  project: Project;
-  onRename: (project: Project) => void;
-  onDelete: (project: Project) => void;
+  project: ProjectSummary;
+  onRename: (project: ProjectSummary) => void;
+  onDelete: (project: ProjectSummary) => void;
 }
 
 function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {

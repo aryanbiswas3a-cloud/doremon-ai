@@ -1,65 +1,101 @@
 "use client";
 
-import { useState } from "react";
-import { MOCK_PROJECTS, toSlug } from "@/lib/mock-data";
-import type { Project } from "@/lib/mock-data";
+import { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import type { ProjectSummary } from "@/lib/projects";
+import { toSlug } from "@/lib/slug";
 
-export function useProjectDialogs() {
-  const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
+function randomSuffix(): string {
+  return Math.random().toString(36).slice(2, 6);
+}
+
+interface UseProjectDialogsProps {
+  ownedProjects: ProjectSummary[];
+  sharedProjects: ProjectSummary[];
+}
+
+export function useProjectDialogs({ ownedProjects, sharedProjects }: UseProjectDialogsProps) {
+  const router = useRouter();
 
   const [createOpen, setCreateOpen] = useState(false);
-  const [renameTarget, setRenameTarget] = useState<Project | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+  const [renameTarget, setRenameTarget] = useState<ProjectSummary | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<ProjectSummary | null>(null);
 
   const [createName, setCreateName] = useState("");
   const [renameName, setRenameName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const createSlug = toSlug(createName);
+  const suffixRef = useRef(randomSuffix());
+
+  const slug = toSlug(createName);
+  const createSlug = slug ? `${slug}-${suffixRef.current}` : "";
+
+  const projects: ProjectSummary[] = [...ownedProjects, ...sharedProjects];
 
   function openCreate() {
+    suffixRef.current = randomSuffix();
     setCreateName("");
     setCreateOpen(true);
   }
 
-  function openRename(project: Project) {
+  function openRename(project: ProjectSummary) {
     setRenameTarget(project);
     setRenameName(project.name);
   }
 
-  function openDelete(project: Project) {
+  function openDelete(project: ProjectSummary) {
     setDeleteTarget(project);
   }
 
-  function submitCreate() {
+  async function submitCreate() {
     if (!createName.trim()) return;
     setIsLoading(true);
-    setProjects((prev) => [
-      ...prev,
-      { id: Date.now().toString(), name: createName.trim(), slug: createSlug, isOwner: true },
-    ]);
-    setCreateOpen(false);
-    setCreateName("");
-    setIsLoading(false);
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: createName.trim() }),
+      });
+      if (!res.ok) throw new Error("Failed to create");
+      const { project } = await res.json();
+      setCreateOpen(false);
+      setCreateName("");
+      router.push(`/editor/${project.id}`);
+    } catch {
+      // keep dialog open on error
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function submitRename() {
+  async function submitRename() {
     if (!renameTarget || !renameName.trim()) return;
-    setProjects((prev) =>
-      prev.map((p) =>
-        p.id === renameTarget.id
-          ? { ...p, name: renameName.trim(), slug: toSlug(renameName.trim()) }
-          : p
-      )
-    );
-    setRenameTarget(null);
-    setRenameName("");
+    try {
+      const res = await fetch(`/api/project/${renameTarget.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: renameName.trim() }),
+      });
+      if (!res.ok) throw new Error("Failed to rename");
+      setRenameTarget(null);
+      setRenameName("");
+      router.refresh();
+    } catch {
+      // keep dialog open on error
+    }
   }
 
-  function submitDelete() {
+  async function submitDelete() {
     if (!deleteTarget) return;
-    setProjects((prev) => prev.filter((p) => p.id !== deleteTarget.id));
+    const targetId = deleteTarget.id;
     setDeleteTarget(null);
+    const res = await fetch(`/api/project/${targetId}`, { method: "DELETE" });
+    if (!res.ok) return;
+    if (window.location.pathname.startsWith(`/editor/${targetId}`)) {
+      router.push("/editor");
+    } else {
+      router.refresh();
+    }
   }
 
   return {

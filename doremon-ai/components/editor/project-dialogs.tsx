@@ -33,7 +33,7 @@ export function CreateProjectDialog({ dialogs }: { dialogs: ProjectDialogs }) {
             autoFocus
           />
           <p className="font-mono text-xs text-[var(--text-faint)]">
-            slug:{" "}
+            room:{" "}
             <span className="text-[var(--text-muted)]">{createSlug || "—"}</span>
           </p>
         </div>
