@@ -32,6 +32,7 @@ export function ShareDialog({
 }: ShareDialogProps) {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
   const [loading, setLoading] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [inviteEmail, setInviteEmail] = useState("");
   const [inviteLoading, setInviteLoading] = useState(false);
   const [inviteError, setInviteError] = useState<string | null>(null);
@@ -39,12 +40,19 @@ export function ShareDialog({
 
   const fetchCollaborators = useCallback(async () => {
     setLoading(true);
+    setFetchError(null);
+    setCollaborators([]);
     try {
       const res = await fetch(`/api/project/${projectId}/collaborators`);
       if (res.ok) {
         const data = await res.json() as { collaborators: Collaborator[] };
         setCollaborators(data.collaborators);
+      } else {
+        const data = await res.json().catch(() => ({})) as { error?: string };
+        setFetchError(data.error ?? "Failed to load collaborators");
       }
+    } catch {
+      setFetchError("Failed to load collaborators");
     } finally {
       setLoading(false);
     }
@@ -135,6 +143,8 @@ export function ShareDialog({
         <div className="space-y-1">
           {loading ? (
             <p className="py-2 text-xs text-[var(--text-muted)]">Loading…</p>
+          ) : fetchError ? (
+            <p className="py-2 text-xs text-red-400">{fetchError}</p>
           ) : collaborators.length === 0 ? (
             <p className="py-2 text-xs text-[var(--text-muted)]">
               No collaborators yet
