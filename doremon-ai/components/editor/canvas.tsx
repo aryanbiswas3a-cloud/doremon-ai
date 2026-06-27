@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -20,7 +20,7 @@ import {
   type OnConnect,
 } from "@xyflow/react";
 import { useLiveblocksFlow, Cursors } from "@liveblocks/react-flow";
-import { useUndo, useRedo, useCanUndo, useCanRedo } from "@liveblocks/react";
+import { useUndo, useRedo, useCanUndo, useCanRedo, useUpdateMyPresence, useOther } from "@liveblocks/react";
 import { ZoomIn, ZoomOut, Maximize2, Undo2, Redo2 } from "lucide-react";
 import "@xyflow/react/dist/style.css";
 import "@liveblocks/react-ui/styles.css";
@@ -31,6 +31,8 @@ import { CanvasEdgeComponent } from "@/components/editor/canvas-edge";
 import { ShapePanel } from "@/components/editor/shape-panel";
 import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { PresenceAvatars } from "@/components/editor/presence-avatars";
+import { useCanvasAutosave, type SaveStatus } from "@/hooks/useCanvasAutosave";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
 import type { NodeShape } from "@/types/canvas";
 
@@ -52,6 +54,58 @@ let nodeIdCounter = 0;
 
 function generateId(shape: string): string {
   return `${shape}-${Date.now()}-${++nodeIdCounter}`;
+}
+
+function trimDisplayName(name: string): string {
+  return name.split(" - ")[0].trim().split(" ")[0];
+}
+
+function CustomCursor({ connectionId }: { connectionId: number; userId: string }) {
+  const other = useOther(connectionId, (o) => ({
+    color: o.info?.color ?? "#6366f1",
+    name: o.info?.name ?? "User",
+  }));
+
+  if (!other) return null;
+
+  const label = trimDisplayName(other.name);
+
+  return (
+    <div style={{ pointerEvents: "none", userSelect: "none" }}>
+      <svg
+        width="16"
+        height="20"
+        viewBox="0 0 16 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M0 0L0 14L4 10.5L6.5 17L8.5 16L6 9.5L11 9.5L0 0Z"
+          fill={other.color}
+          stroke="white"
+          strokeWidth="1"
+        />
+      </svg>
+      <div
+        style={{
+          marginTop: 4,
+          marginLeft: 12,
+          backgroundColor: other.color,
+          color: "#ffffff",
+          fontSize: 11,
+          fontWeight: 600,
+          lineHeight: 1,
+          padding: "3px 7px",
+          borderRadius: 9999,
+          whiteSpace: "nowrap",
+          display: "inline-block",
+          boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
+        }}
+      >
+        {label}
+      </div>
+    </div>
+  );
 }
 
 function CtrlButton({
@@ -86,6 +140,8 @@ interface CanvasFlowProps {
   onDelete: (params: { nodes: Node[]; edges: Edge[] }) => void;
   isTemplatesOpen: boolean;
   onTemplatesClose: () => void;
+  saveStatus: SaveStatus;
+  fitViewTrigger: number;
 }
 
 function CanvasFlow({
@@ -97,14 +153,56 @@ function CanvasFlow({
   onDelete,
   isTemplatesOpen,
   onTemplatesClose,
+  saveStatus,
+  fitViewTrigger,
 }: CanvasFlowProps) {
   const flow = useReactFlow();
   const undo = useUndo();
   const redo = useRedo();
   const canUndo = useCanUndo();
   const canRedo = useCanRedo();
+  const updateMyPresence = useUpdateMyPresence();
+  useEffect(() => {
+    if (fitViewTrigger > 0) {
+      flow.fitView({ duration: 300 });
+    }
+  }, [fitViewTrigger, flow]);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Delete" && e.key !== "Backspace") return;
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable
+      ) return;
+
+      const selectedNodes = flow.getNodes().filter((n) => n.selected);
+      const selectedEdges = flow.getEdges().filter((eg) => eg.selected);
+
+      if (selectedNodes.length > 0 || selectedEdges.length > 0) {
+        onDelete({ nodes: selectedNodes, edges: selectedEdges });
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [flow, onDelete]);
 
   useKeyboardShortcuts(undo, redo);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      const pos = flow.screenToFlowPosition({ x: e.clientX, y: e.clientY });
+      updateMyPresence({ cursor: { x: pos.x, y: pos.y } });
+    },
+    [flow, updateMyPresence]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    updateMyPresence({ cursor: null });
+  }, [updateMyPresence]);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -197,15 +295,22 @@ function CanvasFlow({
         onDelete={onDelete}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         connectionMode={ConnectionMode.Loose}
         nodeTypes={nodeTypes}
         edgeTypes={edgeTypes}
         defaultEdgeOptions={defaultEdgeOptions}
-        fitView
+        deleteKeyCode={null}
       >
-        <Cursors />
+        <Cursors components={{ Cursor: CustomCursor }} />
         <MiniMap />
         <Background variant={BackgroundVariant.Dots} />
+        <Panel position="top-right" className="mr-3 mt-3">
+          <div className="flex items-center rounded-full px-2 py-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] shadow-md pointer-events-none">
+            <PresenceAvatars />
+          </div>
+        </Panel>
         <Panel position="bottom-left" className="mb-4 ml-4">
           <div className="flex items-center px-1 py-1 bg-[var(--bg-elevated)] border border-[var(--border-default)] rounded-full shadow-lg">
             <CtrlButton onClick={() => flow.zoomOut({ duration: 200 })} title="Zoom out (-)">
@@ -224,6 +329,24 @@ function CanvasFlow({
             <CtrlButton onClick={redo} disabled={!canRedo} title="Redo (Ctrl+Shift+Z)">
               <Redo2 className="w-4 h-4" />
             </CtrlButton>
+            {saveStatus !== "idle" && (
+              <>
+                <div className="w-px h-4 bg-[var(--border-default)] mx-0.5 flex-shrink-0" />
+                <span
+                  className={`text-xs px-2 whitespace-nowrap ${
+                    saveStatus === "error"
+                      ? "text-red-400"
+                      : "text-[var(--text-muted)]"
+                  }`}
+                >
+                  {saveStatus === "saving"
+                    ? "Saving…"
+                    : saveStatus === "saved"
+                    ? "Saved"
+                    : "Save failed"}
+                </span>
+              </>
+            )}
           </div>
         </Panel>
       </ReactFlow>
@@ -240,15 +363,67 @@ function CanvasFlow({
 interface CanvasProps {
   isTemplatesOpen: boolean;
   onTemplatesClose: () => void;
+  projectId: string;
+  onSaveStatusChange: (status: SaveStatus) => void;
+  onRegisterSave?: (fn: () => void) => void;
 }
 
-export function Canvas({ isTemplatesOpen, onTemplatesClose }: CanvasProps) {
+export function Canvas({ isTemplatesOpen, onTemplatesClose, projectId, onSaveStatusChange, onRegisterSave }: CanvasProps) {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<Node, Edge>({
       suspense: true,
       nodes: { initial: [] },
       edges: { initial: [] },
     });
+
+  const [autosaveEnabled, setAutosaveEnabled] = useState(false);
+  const [fitViewTrigger, setFitViewTrigger] = useState(0);
+  const loadedRef = useRef(false);
+
+  useEffect(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
+
+    if (nodes.length > 0 || edges.length > 0) {
+      setAutosaveEnabled(true);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/projects/${projectId}/canvas`);
+        if (!res.ok) return;
+        const data = await res.json();
+        if (cancelled) return;
+        const savedNodes: Node[] = data?.canvas?.nodes ?? [];
+        const savedEdges: Edge[] = data?.canvas?.edges ?? [];
+        if (savedNodes.length) {
+          onNodesChange(savedNodes.map((n) => ({ type: "add" as const, item: n })));
+          setFitViewTrigger((t) => t + 1);
+        }
+        if (savedEdges.length) {
+          onEdgesChange(savedEdges.map((e) => ({ type: "add" as const, item: e })));
+        }
+      } catch {
+        // ignore load errors
+      } finally {
+        if (!cancelled) setAutosaveEnabled(true);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { status: saveStatus, saveNow } = useCanvasAutosave(projectId, nodes, edges, autosaveEnabled);
+
+  useEffect(() => {
+    onSaveStatusChange(saveStatus);
+  }, [saveStatus, onSaveStatusChange]);
+
+  useEffect(() => {
+    onRegisterSave?.(saveNow);
+  }, [saveNow, onRegisterSave]);
 
   return (
     <ReactFlowProvider>
@@ -261,6 +436,8 @@ export function Canvas({ isTemplatesOpen, onTemplatesClose }: CanvasProps) {
         onDelete={onDelete}
         isTemplatesOpen={isTemplatesOpen}
         onTemplatesClose={onTemplatesClose}
+        saveStatus={saveStatus}
+        fitViewTrigger={fitViewTrigger}
       />
     </ReactFlowProvider>
   );
