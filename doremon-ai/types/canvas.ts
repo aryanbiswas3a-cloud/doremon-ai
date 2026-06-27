@@ -15,7 +15,7 @@ export type NodeData = {
 };
 
 export type CanvasNode = Node<NodeData, "canvasNode">;
-export type CanvasEdge = Edge<Record<string, never>, "canvasEdge">;
+export type CanvasEdge = Edge<{ label?: string }, "canvasEdge">;
 
 export interface NodeColorPair {
   fill: string;

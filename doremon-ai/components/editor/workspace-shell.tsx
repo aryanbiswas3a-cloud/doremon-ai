@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Bot, Share2 } from "lucide-react";
+import { Bot, LayoutTemplate, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ShareDialog } from "@/components/editor/share-dialog";
 import { CanvasWrapper } from "@/components/editor/canvas-wrapper";
@@ -19,6 +19,7 @@ interface WorkspaceShellProps {
 export function WorkspaceShell({ project }: WorkspaceShellProps) {
   const [isAISidebarOpen, setIsAISidebarOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isTemplatesOpen, setIsTemplatesOpen] = useState(false);
 
   return (
     <div className="flex h-full flex-col">
@@ -28,6 +29,15 @@ export function WorkspaceShell({ project }: WorkspaceShellProps) {
           {project.name}
         </h1>
         <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsTemplatesOpen(true)}
+            className="h-7 gap-1.5 border-[var(--border-subtle)] bg-[var(--bg-elevated)] text-xs text-[var(--text-secondary)]"
+          >
+            <LayoutTemplate className="h-3.5 w-3.5" />
+            Templates
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -59,7 +69,11 @@ export function WorkspaceShell({ project }: WorkspaceShellProps) {
       <div className="flex flex-1 overflow-hidden">
         {/* Canvas */}
         <div className="flex flex-1 overflow-hidden">
-          <CanvasWrapper roomId={project.id} />
+          <CanvasWrapper
+            roomId={project.id}
+            isTemplatesOpen={isTemplatesOpen}
+            onTemplatesClose={() => setIsTemplatesOpen(false)}
+          />
         </div>
 
         {/* AI sidebar placeholder */}
