@@ -15,7 +15,10 @@ export async function getCurrentIdentity(): Promise<{
   const { userId } = await auth();
   if (!userId) return null;
   const user = await currentUser();
-  const email = user?.emailAddresses[0]?.emailAddress ?? null;
+  const primaryEntry = user?.emailAddresses.find(
+    (e) => e.id === user.primaryEmailAddressId
+  );
+  const email = (primaryEntry ?? user?.emailAddresses[0])?.emailAddress ?? null;
   return { userId, email };
 }
 
@@ -40,7 +43,7 @@ export async function getProjectAccess(
 
   const isOwner = project.ownerId === userId;
   const isCollaborator = email
-    ? project.collaborators.some((c) => c.email === email)
+    ? project.collaborators.some((c) => c.email.toLowerCase() === email.toLowerCase())
     : false;
 
   if (!isOwner && !isCollaborator) return null;

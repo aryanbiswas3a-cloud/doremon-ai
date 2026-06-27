@@ -69,7 +69,7 @@ export async function GET(_request: NextRequest, { params }: RouteContext) {
 
   const isOwner = project.ownerId === userId;
   const isCollaborator = callerEmail
-    ? project.collaborators.some((c) => c.email === callerEmail)
+    ? project.collaborators.some((c) => c.email.toLowerCase() === callerEmail.toLowerCase())
     : false;
 
   if (!isOwner && !isCollaborator) {
@@ -104,9 +104,9 @@ export async function POST(request: NextRequest, { params }: RouteContext) {
   if (typeof rawEmail !== "string" || !EMAIL_RE.test(rawEmail.trim())) {
     return Response.json({ error: "Valid email is required" }, { status: 400 });
   }
-  const email = rawEmail.trim();
+  const email = rawEmail.trim().toLowerCase();
 
-  if (identity.email?.toLowerCase() === email.toLowerCase()) {
+  if (identity.email?.toLowerCase() === email) {
     return Response.json({ error: "You are already the owner" }, { status: 409 });
   }
 
@@ -151,7 +151,7 @@ export async function DELETE(request: NextRequest, { params }: RouteContext) {
   if (typeof rawEmail !== "string" || !rawEmail.trim()) {
     return Response.json({ error: "email is required" }, { status: 400 });
   }
-  const email = rawEmail.trim();
+  const email = rawEmail.trim().toLowerCase();
 
   await prisma.projectCollaborator.deleteMany({
     where: { projectId, email },
