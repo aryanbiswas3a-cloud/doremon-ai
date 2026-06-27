@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,6 +25,9 @@ export function ProjectSidebar({
   onRename,
   onDelete,
 }: ProjectSidebarProps) {
+  const pathname = usePathname();
+  const activeId = pathname.startsWith("/editor/") ? pathname.split("/")[2] : null;
+
   const myProjects = projects.filter((p) => p.isOwner);
   const sharedProjects = projects.filter((p) => !p.isOwner);
 
@@ -74,6 +79,7 @@ export function ProjectSidebar({
                       project={project}
                       onRename={onRename}
                       onDelete={onDelete}
+                      isActive={project.id === activeId}
                     />
                   ))}
                 </div>
@@ -95,6 +101,7 @@ export function ProjectSidebar({
                       project={project}
                       onRename={onRename}
                       onDelete={onDelete}
+                      isActive={project.id === activeId}
                     />
                   ))}
                 </div>
@@ -123,14 +130,28 @@ interface ProjectItemProps {
   project: ProjectSummary;
   onRename: (project: ProjectSummary) => void;
   onDelete: (project: ProjectSummary) => void;
+  isActive?: boolean;
 }
 
-function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
+function ProjectItem({ project, onRename, onDelete, isActive }: ProjectItemProps) {
   return (
-    <div className="group flex items-center gap-1 rounded-xl px-2 py-2 hover:bg-[var(--bg-elevated)]">
-      <span className="flex-1 truncate text-sm text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]">
+    <div
+      className={`group flex items-center gap-1 rounded-xl px-2 py-2 ${
+        isActive
+          ? "bg-[var(--bg-elevated)]"
+          : "hover:bg-[var(--bg-elevated)]"
+      }`}
+    >
+      <Link
+        href={`/editor/${project.id}`}
+        className={`flex-1 truncate text-sm ${
+          isActive
+            ? "font-medium text-[var(--text-primary)]"
+            : "text-[var(--text-secondary)] group-hover:text-[var(--text-primary)]"
+        }`}
+      >
         {project.name}
-      </span>
+      </Link>
       <div className="flex items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 motion-safe:group-hover:opacity-100 sm:opacity-100">
         {project.isOwner && (
           <>
