@@ -77,3 +77,7 @@ body {
   color: var(--text-primary);
   font-family: var(--font-geist-sans), sans-serif;
 }
+
+#liveblocks-badge {
+  display: none !important;
+}
