@@ -32,6 +32,7 @@ import { ShapePanel } from "@/components/editor/shape-panel";
 import { StarterTemplatesModal } from "@/components/editor/starter-templates-modal";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import type { CanvasTemplate } from "@/components/editor/starter-templates";
+import type { NodeShape } from "@/types/canvas";
 
 const nodeTypes: NodeTypes = {
   canvasNode: CanvasNodeComponent,
@@ -144,6 +145,31 @@ function CanvasFlow({
     [flow, onNodesChange]
   );
 
+  const handleAddShape = useCallback(
+    (shape: NodeShape, width: number, height: number) => {
+      const position = flow.screenToFlowPosition({
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+      });
+      const newNode: Node = {
+        id: generateId(shape),
+        type: "canvasNode",
+        position: {
+          x: position.x - width / 2,
+          y: position.y - height / 2,
+        },
+        style: { width, height },
+        data: {
+          label: "",
+          color: "#1F1F1F",
+          shape,
+        },
+      };
+      onNodesChange([{ type: "add", item: newNode }]);
+    },
+    [flow, onNodesChange]
+  );
+
   const handleImport = useCallback(
     (template: CanvasTemplate) => {
       if (nodes.length > 0) {
@@ -201,7 +227,7 @@ function CanvasFlow({
           </div>
         </Panel>
       </ReactFlow>
-      <ShapePanel />
+      <ShapePanel onAddShape={handleAddShape} />
       <StarterTemplatesModal
         open={isTemplatesOpen}
         onOpenChange={(o) => { if (!o) onTemplatesClose(); }}

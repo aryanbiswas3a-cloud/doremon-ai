@@ -121,6 +121,7 @@ export function CanvasEdgeComponent({
               ref={inputRef}
               defaultValue={label}
               autoFocus
+              aria-label="Edge label"
               onChange={(e) =>
                 setInputWidth(Math.max(60, e.target.value.length * 8 + 20))
               }
@@ -133,16 +134,36 @@ export function CanvasEdgeComponent({
             />
           ) : label ? (
             <span
+              role="button"
+              tabIndex={0}
+              aria-label="Edit edge label"
               className="text-xs px-2 py-0.5 rounded-full bg-[var(--bg-elevated)] text-[var(--text-muted)] border border-[var(--border-default)] cursor-text select-none"
               onDoubleClick={startEditing}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "F2") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  startEditing();
+                }
+              }}
             >
               {label}
             </span>
           ) : selected ? (
             <span
+              role="button"
+              tabIndex={0}
+              aria-label="Edit edge label"
               className="text-xs px-2 py-0.5 rounded-full text-[var(--text-muted)] cursor-text select-none"
               style={{ opacity: 0.4 }}
               onDoubleClick={startEditing}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === "F2") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  startEditing();
+                }
+              }}
             >
               label…
             </span>

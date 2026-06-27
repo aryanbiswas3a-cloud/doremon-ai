@@ -162,7 +162,7 @@ function ShapeGhost({ state }: { state: DragState }) {
   );
 }
 
-export function ShapePanel() {
+export function ShapePanel({ onAddShape }: { onAddShape?: (shape: NodeShape, width: number, height: number) => void }) {
   const [dragState, setDragState] = useState<DragState | null>(null);
   const [mounted, setMounted] = useState(false);
   const ghostImgRef = useRef<HTMLImageElement | null>(null);
@@ -213,6 +213,7 @@ export function ShapePanel() {
           <button
             key={config.shape}
             draggable
+            onClick={() => onAddShape?.(config.shape, config.width, config.height)}
             onDragStart={(e) => handleDragStart(e, config)}
             onDrag={handleDrag}
             onDragEnd={handleDragEnd}

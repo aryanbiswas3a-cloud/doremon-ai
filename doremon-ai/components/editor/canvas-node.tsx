@@ -65,6 +65,8 @@ function ColorToolbar({ id, activeColor, isVisible }: { id: string; activeColor:
           return (
             <button
               key={pair.fill}
+              aria-label={pair.name}
+              aria-pressed={isActive}
               className="nodrag nopan w-5 h-5 rounded-full focus:outline-none"
               style={{
                 backgroundColor: pair.fill,
@@ -159,6 +161,9 @@ export function CanvasNodeComponent({ id, data, selected }: NodeProps<CanvasNode
         ref={editableRef}
         contentEditable
         suppressContentEditableWarning
+        role="textbox"
+        aria-label="Node label"
+        aria-multiline="false"
         className="nodrag nopan w-full px-2 text-center text-sm font-medium leading-snug break-words outline-none"
         style={{ color: pair.text, cursor: "text", minHeight: "1em" }}
         onBlur={commitEdit}
@@ -169,9 +174,18 @@ export function CanvasNodeComponent({ id, data, selected }: NodeProps<CanvasNode
   ) : (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
       <span
+        role="button"
+        tabIndex={0}
+        aria-label="Edit node label"
         className="px-2 text-center break-words leading-snug text-sm font-medium select-none"
         style={{ color: pair.text, pointerEvents: "auto" }}
         onDoubleClick={startEditing}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            startEditing();
+          }
+        }}
       >
         {data.label ? data.label : <span style={{ opacity: 0.4 }}>Label...</span>}
       </span>
