@@ -5,6 +5,15 @@ import { useUser, UserButton } from "@clerk/nextjs";
 
 const AVATAR_SIZE = 28;
 const MAX_VISIBLE = 5;
+const TRUSTED_AVATAR_HOSTS = ["img.clerk.com"];
+
+function isTrustedAvatarUrl(url: string): boolean {
+  try {
+    return TRUSTED_AVATAR_HOSTS.includes(new URL(url).hostname);
+  } catch {
+    return false;
+  }
+}
 
 function CollaboratorAvatar({
   name,
@@ -42,7 +51,7 @@ function CollaboratorAvatar({
         boxShadow: "0 0 0 2px var(--bg-base)",
       }}
     >
-      {imageUrl ? (
+      {imageUrl && isTrustedAvatarUrl(imageUrl) ? (
         <img
           src={imageUrl}
           alt={name}

@@ -12,6 +12,7 @@ export function useCanvasAutosave(
   const [status, setStatus] = useState<SaveStatus>("idle");
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSavingRef = useRef(false);
   const nodesRef = useRef(nodes);
   const edgesRef = useRef(edges);
 
@@ -19,6 +20,8 @@ export function useCanvasAutosave(
   useEffect(() => { edgesRef.current = edges; }, [edges]);
 
   const save = useCallback(async () => {
+    if (isSavingRef.current) return;
+    isSavingRef.current = true;
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     setStatus("saving");
     try {
@@ -31,9 +34,19 @@ export function useCanvasAutosave(
       setStatus("saved");
     } catch {
       setStatus("error");
+    } finally {
+      isSavingRef.current = false;
+      resetTimerRef.current = setTimeout(() => setStatus("idle"), 2000);
     }
-    resetTimerRef.current = setTimeout(() => setStatus("idle"), 2000);
   }, [projectId]);
+
+  const saveNow = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    save();
+  }, [save]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -44,5 +57,5 @@ export function useCanvasAutosave(
     };
   }, [nodes, edges, enabled, save]);
 
-  return { status, saveNow: save };
+  return { status, saveNow };
 }

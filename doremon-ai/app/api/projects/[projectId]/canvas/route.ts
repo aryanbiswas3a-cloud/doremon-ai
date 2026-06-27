@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest, { params }: RouteContext) {
   }
 
   const body = await request.json().catch(() => null);
-  if (!body) {
+  if (!body || !Array.isArray(body.nodes) || !Array.isArray(body.edges)) {
     return Response.json({ error: "Invalid body" }, { status: 400 });
   }
 
